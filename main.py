@@ -6,12 +6,26 @@ app = Flask(__name__)
 
 # --- Database Connection Helper ---
 def get_db_connection():
+    db_host = os.environ.get("DB_HOST")
+    db_user = os.environ.get("DB_USER")
+    db_password = os.environ.get("DB_PASSWORD")
+    db_name = os.environ.get("DB_NAME")
+    db_port = os.environ.get("DB_PORT", "3306")
+
+    # Fallback to alternative naming if DB_HOST isn't found
+    if not db_host:
+        db_host = os.environ.get("MYSQLHOST")
+        db_user = os.environ.get("MYSQLUSER")
+        db_password = os.environ.get("MYSQLPASSWORD")
+        db_name = os.environ.get("MYSQLDATABASE")
+        db_port = os.environ.get("MYSQLPORT", "3306")
+
     return mysql.connector.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD", "password"),
-        database=os.getenv("DB_NAME", "medicine_db"),
-        port=int(os.getenv("DB_PORT", 3306))
+        host=db_host,
+        user=db_user,
+        password=db_password,
+        database=db_name,
+        port=int(db_port)
     )
 
 # 1. Main Page Route

@@ -74,15 +74,27 @@ def login():
     except Exception as e:
         return f"Database error: {str(e)}", 500
 
-# 3. Patient Registration Endpoint
+# 3. Patient Registration Endpoint (Supports GET, HTML Forms, and JSON API payloads)
+@app.route('/register', methods=['GET', 'POST'])
 @app.route('/api/register', methods=['POST'])
 def register():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
-    email = data.get('email')
-    age = data.get('age')
-    disease = data.get('disease')
+    if request.method == 'GET':
+        return render_template('index.html')
+
+    # Parse input from either JSON or standard form fields
+    if request.is_json:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        email = data.get('email')
+        age = data.get('age')
+        disease = data.get('disease')
+    else:
+        username = request.form.get('username')
+        password = request.form.get('password')
+        email = request.form.get('email')
+        age = request.form.get('age')
+        disease = request.form.get('disease')
 
     try:
         conn = get_db_connection()
@@ -97,9 +109,17 @@ def register():
         cursor.close()
         conn.close()
 
-        return jsonify({"message": "User registered successfully!"}), 201
+        if request.is_json:
+            return jsonify({"message": "User registered successfully!"}), 201
+
+        return "<div style='font-family: sans-serif; text-align: center; padding: 50px;'>" \
+               "<h1>Account created successfully!</h1>" \
+               "<a href='/'>Click here to Sign In</a></div>"
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        if request.is_json:
+            return jsonify({"error": str(e)}), 500
+        return f"Database error: {str(e)}", 500
 
 if __name__ == '__main__':
     app.run(debug=True)

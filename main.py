@@ -7,11 +7,11 @@ app = Flask(__name__)
 # --- Database Connection Helper ---
 def get_db_connection():
     return mysql.connector.connect(
-        host=os.getenv("MYSQLHOST", "localhost"),
-        user=os.getenv("MYSQLUSER", "root"),
-        password=os.getenv("MYSQLPASSWORD", "password"),
-        database=os.getenv("MYSQLDATABASE", "medicine_db"),
-        port=int(os.getenv("MYSQLPORT", 3306))
+        host=os.getenv("DB_HOST", "localhost"),
+        user=os.getenv("DB_USER", "root"),
+        password=os.getenv("DB_PASSWORD", "password"),
+        database=os.getenv("DB_NAME", "medicine_db"),
+        port=int(os.getenv("DB_PORT", 3306))
     )
 
 # 1. Main Page Route
@@ -19,7 +19,7 @@ def get_db_connection():
 def home():
     return render_template('index.html')
 
-# 2. Login Endpoint (Fixes the 404 error)
+# 2. Login Endpoint
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form.get('username')

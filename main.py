@@ -43,9 +43,12 @@ def get_db_connection():
 def home():
     return render_template('index.html')
 
-# 2. Login Endpoint
-@app.route('/login', methods=['POST'])
+# 2. Login Endpoint (Supports GET for page load and POST for form submission)
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET':
+        return render_template('index.html')
+
     username = request.form.get('username')
     password = request.form.get('password')
 

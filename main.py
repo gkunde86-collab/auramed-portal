@@ -12,15 +12,8 @@ def get_db_connection():
     db_name = os.environ.get("DB_NAME")
     db_port = os.environ.get("DB_PORT", "3306")
 
-    # Fallback to alternative naming if DB_HOST isn't found
-    if not db_host:
-        db_host = os.environ.get("MYSQLHOST")
-        db_user = os.environ.get("MYSQLUSER")
-        db_password = os.environ.get("MYSQLPASSWORD")
-        db_name = os.environ.get("MYSQLDATABASE")
-        db_port = os.environ.get("MYSQLPORT", "3306")
-
-    return mysql.connector.connect(
+    # Connect to MySQL database
+    conn = mysql.connector.connect(
         host=db_host,
         user=db_user,
         password=db_password,
@@ -28,7 +21,24 @@ def get_db_connection():
         port=int(db_port)
     )
 
-# 1. Main Page Route
+    # Automatically create the 'patients' table if it does not exist
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS patients (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            email VARCHAR(255),
+            age INT,
+            disease VARCHAR(255)
+        )
+    """)
+    conn.commit()
+    cursor.close()
+
+    return conn
+
+# 1. Main Home Route
 @app.route('/')
 def home():
     return render_template('index.html')

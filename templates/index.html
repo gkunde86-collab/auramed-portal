@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraMed — Smart Health Companion</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --accent: #06b6d4;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-card: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .glow-1, .glow-2 {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.5;
+        }
+        .glow-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: var(--primary); }
+        .glow-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: var(--accent); }
+
+        .app-container {
+            width: 100%;
+            max-width: 460px;
+            background: var(--glass-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .brand-icon {
+            font-size: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .brand h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .live-clock {
+            text-align: center;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 8px 16px;
+            border-radius: 30px;
+            width: fit-content;
+            margin: 0 auto 20px auto;
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            margin-top: 10px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .btn-danger {
+            background: var(--danger);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+            margin-top: 16px;
+        }
+
+        .nav-toggle {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .nav-toggle a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .patient-card {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(6, 182, 212, 0.2));
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .patient-card h4 {
+            font-size: 16px;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .patient-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 12px;
+        }
+        .patient-meta span {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* Settings Card Box */
+        .settings-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .settings-card h4 {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .med-list {
+            list-style: none;
+            margin-top: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .med-list::-webkit-scrollbar { width: 4px; }
+        .med-list::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+
+        .med-item {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .med-info h5 { font-size: 14px; color: var(--text-main); }
+        .med-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .med-time {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Alarm Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-box {
+            background: var(--glass-card);
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 340px;
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
+            animation: pulseModal 1.5s infinite alternate;
+        }
+        @keyframes pulseModal {
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
+        }
+        .modal-icon {
+            font-size: 48px;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+
+    <div class="app-container">
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-capsules"></i></div>
+            <h1>AuraMed Portal</h1>
+        </div>
+
+        <div class="live-clock" id="liveClock">
+            <i class="fa-regular fa-clock"></i> 00:00:00 PM
+        </div>
+
+        <!-- 1. LOGIN SECTION -->
+        <div id="loginSection">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="loginUsername" placeholder="Enter username" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Enter password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Sign In</button>
+            </form>
+            <div class="nav-toggle">
+                New patient? <a onclick="showView('registerSection')">Create Account</a>
+            </div>
+        </div>
+
+        <!-- 2. REGISTRATION SECTION -->
+        <div id="registerSection" class="hidden">
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="regUsername" placeholder="Choose username" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="regPassword" placeholder="Choose password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="regEmail" placeholder="patient@example.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-calendar"></i>
+                        <input type="number" id="regAge" placeholder="e.g. 42" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Medical Condition / Disease</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                        <input type="text" id="regDisease" placeholder="e.g. Hypertension" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Complete Registration</button>
+            </form>
+            <div class="nav-toggle">
+                Already registered? <a onclick="showView('loginSection')">Sign In</a>
+            </div>
+        </div>
+
+        <!-- 3. DASHBOARD SECTION -->
+        <div id="dashboardSection" class="hidden">
+            <div class="patient-card">
+                <h4 id="userGreeting"><i class="fa-solid fa-user-check"></i> Patient Profile</h4>
+                <div class="patient-meta" id="userMeta"></div>
+            </div>
+
+            <!-- ALARM SETTINGS BOX -->
+            <div class="settings-card">
+                <h4><i class="fa-solid fa-sliders"></i> Alarm Settings</h4>
+                
+                <div class="setting-item">
+                    <span>Enable Sound Alarm</span>
+                    <input type="checkbox" id="settingSoundToggle" checked style="width: auto;">
+                </div>
+
+                <div class="setting-item">
+                    <span>Alarm Tone</span>
+                    <select id="settingSoundTone" style="width: 55%; padding: 6px 10px;">
+                        <option value="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3">Digital Ring</option>
+                        <option value="https://assets.mixkit.co/active_storage/sfx/995/995-preview.mp3">Beep Alert</option>
+                        <option value="https://assets.mixkit.co/active_storage/sfx/1018/1018-preview.mp3">Gentle Chime</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <span>Snooze Duration</span>
+                    <select id="settingSnoozeTime" style="width: 55%; padding: 6px 10px;">
+                        <option value="1">1 Minute</option>
+                        <option value="5" selected>5 Minutes</option>
+                        <option value="10">10 Minutes</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <span>Volume</span>
+                    <input type="range" id="settingVolume" min="0" max="1" step="0.1" value="0.8" style="width: 55%; padding:0;">
+                </div>
+            </div>
+
+            <form id="reminderForm">
+                <div class="form-group">
+                    <label>Medicine Name</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-pills"></i>
+                        <input type="text" id="medName" placeholder="e.g. Amoxicillin" required>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Type</label>
+                        <select id="medType">
+                            <option value="Tablet">Tablet</option>
+                            <option value="Capsule">Capsule</option>
+                            <option value="Syrup">Syrup</option>
+                            <option value="Injection">Injection</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Dosage</label>
+                        <input type="text" id="medDosage" placeholder="e.g. 250mg" required style="padding-left: 14px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Reminder Time</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-bell"></i>
+                        <input type="time" id="medTime" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">+ Add Reminder</button>
+            </form>
+
+            <ul class="med-list" id="medicineList"></ul>
+
+            <button onclick="logout()" class="btn-primary btn-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+    </div>
+
+    <!-- Alarm Overlay Modal -->
+    <div id="alarmModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fa-solid fa-bell fa-bounce"></i></div>
+            <h3 style="margin-bottom: 8px;">Medicine Time!</h3>
+            <p id="alarmDetails" style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;"></p>
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="snoozeAlarm()" class="btn-primary btn-secondary" style="margin:0;">Snooze</button>
+                <button onclick="stopAlarm()" class="btn-primary" style="margin:0;">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="alarmAudio" loop></audio>
+
+    <script>
+        let currentUser = null;
+        let activeAlarmData = null;
+        const triggeredAlarms = new Set();
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveClock').innerHTML = `<i class="fa-regular fa-clock"></i> ${now.toLocaleTimeString()}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function showView(viewId) {
+            ['loginSection', 'registerSection', 'dashboardSection'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                username: document.getElementById('regUsername').value,
+                password: document.getElementById('regPassword').value,
+                email: document.getElementById('regEmail').value,
+                age: document.getElementById('regAge').value,
+                disease: document.getElementById('regDisease').value
+            };
+
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                alert('Account created successfully!');
+                document.getElementById('registerForm').reset();
+                showView('loginSection');
+            } else {
+                alert('Registration failed.');
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                username: document.getElementById('loginUsername').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                currentUser = data.user;
+                document.getElementById('loginForm').reset();
+                loadDashboard();
+            } else {
+                alert(data.error || 'Invalid credentials');
+            }
+        });
+
+        function loadDashboard() {
+            showView('dashboardSection');
+            document.getElementById('userGreeting').innerHTML = `<i class="fa-solid fa-user-check"></i> Welcome, ${currentUser.username}`;
+            document.getElementById('userMeta').innerHTML = `
+                <span><i class="fa-solid fa-envelope"></i> ${currentUser.email}</span>
+                <span><i class="fa-solid fa-notes-medical"></i> ${currentUser.disease}</span>
+            `;
+            fetchMedicines();
+        }
+
+        async function fetchMedicines() {
+            if (!currentUser) return;
+            const res = await fetch(`/api/medicines/${currentUser.id}`);
+            const medicines = await res.json();
+            
+            const ul = document.getElementById('medicineList');
+            ul.innerHTML = '';
+
+            if (medicines.length === 0) {
+                ul.innerHTML = '<li style="text-align:center; color: var(--text-muted); font-size: 13px; padding:10px;">No reminders set.</li>';
+            } else {
+                medicines.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'med-item';
+                    li.innerHTML = `
+                        <div class="med-info">
+                            <h5>${item.name} <small style="color:var(--accent);">(${item.medicine_type})</small></h5>
+                            <p>Dosage: ${item.dosage}</p>
+                        </div>
+                        <div class="med-time"><i class="fa-regular fa-bell"></i> ${item.reminder_time.slice(0, 5)}</div>
+                    `;
+                    ul.appendChild(li);
+                });
+            }
+
+            checkAlarms(medicines);
+        }
+
+        document.getElementById('reminderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                user_id: currentUser.id,
+                name: document.getElementById('medName').value,
+                medicine_type: document.getElementById('medType').value,
+                dosage: document.getElementById('medDosage').value,
+                reminder_time: document.getElementById('medTime').value
+            };
+
+            await fetch('/api/medicines', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            document.getElementById('reminderForm').reset();
+            fetchMedicines();
+        });
+
+        function checkAlarms(medicines) {
+            const now = new Date();
+            const currentTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            medicines.forEach(med => {
+                const timeFormatted = med.reminder_time.slice(0, 5);
+                const alarmKey = `${med.id}-${currentTimeStr}`;
+
+                if (timeFormatted === currentTimeStr && !triggeredAlarms.has(alarmKey)) {
+                    triggeredAlarms.add(alarmKey);
+                    activeAlarmData = med;
+                    triggerAlarmModal(med.name, med.dosage);
+                }
+            });
+        }
+
+        function triggerAlarmModal(medName, dosage) {
+            const soundEnabled = document.getElementById('settingSoundToggle').checked;
+            const toneUrl = document.getElementById('settingSoundTone').value;
+            const volumeVal = parseFloat(document.getElementById('settingVolume').value);
+
+            document.getElementById('alarmDetails').innerText = `Take ${medName} (${dosage}) now!`;
+            document.getElementById('alarmModal').classList.remove('hidden');
+
+            if (soundEnabled) {
+                const audio = document.getElementById('alarmAudio');
+                audio.src = toneUrl;
+                audio.volume = volumeVal;
+                audio.play().catch(e => console.log("Audio waiting for user click interaction"));
+            }
+        }
+
+        function stopAlarm() {
+            const audio = document.getElementById('alarmAudio');
+            audio.pause();
+            audio.currentTime = 0;
+            document.getElementById('alarmModal').classList.add('hidden');
+        }
+
+        function snoozeAlarm() {
+            stopAlarm();
+            const snoozeMinutes = parseInt(document.getElementById('settingSnoozeTime').value);
+            alert(`⏰ Alarm snoozed for ${snoozeMinutes} minute(s).`);
+
+            setTimeout(() => {
+                if (activeAlarmData) {
+                    triggerAlarmModal(activeAlarmData.name, activeAlarmData.dosage);
+                }
+            }, snoozeMinutes * 60 * 1000);
+        }
+
+        function logout() {
+            currentUser = null;
+            showView('loginSection');
+        }
+
+        setInterval(() => {
+            if (currentUser) fetchMedicines();
+        }, 8000);
+    </script>
+</body>
+</html>

@@ -26,7 +26,6 @@ def init_db():
     if conn:
         try:
             cursor = conn.cursor()
-            # Ensure users table exists with correct schema
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -37,7 +36,6 @@ def init_db():
                     disease_type VARCHAR(100) NOT NULL
                 );
             """)
-            # Ensure medicines table exists with correct schema
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS medicines (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -66,9 +64,9 @@ def register():
     data = request.form if request.form else request.get_json()
     username = data.get('username')
     password = data.get('password')
-    email = data.get('email')
-    age = data.get('age')
-    disease_type = data.get('disease') or data.get('disease_type')
+    email = data.get('email', '')
+    age = data.get('age', 0)
+    disease_type = data.get('disease') or data.get('disease_type') or 'General'
 
     if not username or not password:
         return render_template('index.html', error="Username and Password required.")
@@ -85,7 +83,7 @@ def register():
             return render_template('index.html', success="Registration successful! Please login.")
         except Error as e:
             print(f"Registration Error: {e}")
-            return render_template('index.html', error="Username already exists or database error.")
+            return render_template('index.html', error="Username already exists.")
     return render_template('index.html', error="Database connection failed.")
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -100,13 +98,11 @@ def login():
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor(dictionary=True)
-        # Target the users table matching your Workbench database
         cursor.execute("SELECT id, username, email, age, disease_type FROM users WHERE username = %s AND password = %s", (username, password))
         user = cursor.fetchone()
 
         if user:
-            # Fetch active alarms for this specific user from medicines table
-            cursor.execute("SELECT * FROM medicines WHERE user_id = %s", (user['id'],))
+            cursor.execute("SELECT id, name, medicine_type, dosage, CAST(reminder_time AS CHAR) as reminder_time FROM medicines WHERE user_id = %s", (user['id'],))
             alarms = cursor.fetchall()
             cursor.close()
             conn.close()

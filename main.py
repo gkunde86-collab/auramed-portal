@@ -6,7 +6,7 @@ from mysql.connector import Error
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "auramed_super_secret_key")
 
-# Aiven MySQL Database Connection Configuration from Environment Variables
+# Database Connection Helper
 def get_db_connection():
     try:
         connection = mysql.connector.connect(
@@ -15,14 +15,14 @@ def get_db_connection():
             password=os.environ.get("DB_PASSWORD"),
             database=os.environ.get("DB_NAME"),
             port=int(os.environ.get("DB_PORT", 3306)),
-            ssl_ca=os.environ.get("DB_SSL_CA", None)  # Optional SSL path if required by Aiven
+            ssl_ca=os.environ.get("DB_SSL_CA", None)
         )
         return connection
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None
 
-# Auto-initialize database schema on startup
+# Database Schema Initialization
 def init_db():
     conn = get_db_connection()
     if conn:
@@ -46,16 +46,15 @@ def init_db():
         except Error as e:
             print(f"Failed to initialize table: {e}")
 
-# Initialize table when server starts
+# Run schema init on app startup
 init_db()
 
 @app.route('/')
-def index():
+def home():
     return render_template('index.html')
 
 @app.route('/register', methods=['POST'])
 def register():
-    # Handle both JSON payloads and standard form submissions
     if request.is_json:
         data = request.get_json()
         username = data.get('username')
@@ -71,14 +70,10 @@ def register():
         disease = request.form.get('disease')
 
     if not username or not password:
-        if request.is_json:
-            return jsonify({"status": "error", "message": "Username and password required"}), 400
         return render_template('index.html', error="Username and password required")
 
     conn = get_db_connection()
     if not conn:
-        if request.is_json:
-            return jsonify({"status": "error", "message": "Database connection failed"}), 500
         return render_template('index.html', error="Database connection failed")
 
     try:
@@ -90,14 +85,12 @@ def register():
         conn.close()
 
         if request.is_json:
-            return jsonify({"status": "success", "message": "Registration successful"}), 200
-        # Serve main page upon successful registration
+            return jsonify({"status": "success", "message": "Account created!"}), 200
+
         return render_template('index.html', success="Account created successfully! Please sign in.")
 
     except Error as e:
-        print(f"Database error during registration: {e}")
-        if request.is_json:
-            return jsonify({"status": "error", "message": "Username already exists or database error"}), 400
+        print(f"Registration error: {e}")
         return render_template('index.html', error="Registration failed. Username may already exist.")
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -115,8 +108,6 @@ def login():
 
     conn = get_db_connection()
     if not conn:
-        if request.is_json:
-            return jsonify({"status": "error", "message": "Database connection failed"}), 500
         return render_template('index.html', error="Database connection failed")
 
     try:
@@ -129,8 +120,8 @@ def login():
 
         if user:
             if request.is_json:
-                return jsonify({"status": "success", "message": f"Welcome back, {user['username']}!"}), 200
-            # Render index page with logged-in view
+                return jsonify({"status": "success", "user": user['username']}), 200
+            # Renders full index.html UI instead of raw text
             return render_template('index.html', user=user)
         else:
             if request.is_json:
@@ -138,10 +129,8 @@ def login():
             return render_template('index.html', error="Invalid username or password")
 
     except Error as e:
-        print(f"Database error during login: {e}")
-        if request.is_json:
-            return jsonify({"status": "error", "message": "Login failed due to database error"}), 500
-        return render_template('index.html', error="Login failed. Please try again.")
+        print(f"Login error: {e}")
+        return render_template('index.html', error="Login error encountered.")
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

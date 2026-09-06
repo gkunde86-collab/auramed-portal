@@ -3,212 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>medicine_remainder - Smart Health Companion</title>
-    <!-- Google Fonts & FontAwesome Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>medicine_remainder</title>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --accent: #06b6d4;
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --glass-card: rgba(30, 41, 59, 0.7);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --danger: #ef4444;
-            --success: #10b981;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            min-height: 100vh;
+            background-color: #121225;
+            color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            min-height: 100vh;
         }
 
-        .container {
+        .card {
+            background-color: #1c1c36;
+            border-radius: 12px;
+            padding: 30px;
             width: 100%;
-            max-width: 450px;
-            background: var(--glass-card);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 40px 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .header {
+            max-width: 400px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             text-align: center;
-            margin-bottom: 32px;
         }
 
-        .brand-icon {
-            font-size: 2.5rem;
-            color: var(--accent);
+        .logo {
+            width: 48px;
+            height: 48px;
             margin-bottom: 12px;
-            display: inline-block;
         }
 
-        .header h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            margin-bottom: 8px;
-        }
-
-        .clock-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--accent);
-            font-weight: 500;
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
         }
 
         .form-group {
-            margin-bottom: 20px;
-            position: relative;
+            margin-bottom: 15px;
+            text-align: left;
         }
 
-        .form-group label {
+        label {
             display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 8px;
+            font-size: 0.75rem;
+            color: #a0a0c0;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
         }
 
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .form-control {
+        input {
             width: 100%;
-            padding: 14px 16px 14px 44px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-main);
-            font-size: 0.95rem;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #2e2e54;
+            background-color: #121225;
+            color: #ffffff;
+            font-size: 0.9rem;
             outline: none;
-            transition: all 0.2s ease;
         }
 
-        .form-control:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        input:focus {
+            border-color: #4f46e5;
         }
 
-        .btn-primary {
+        .btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            padding: 12px;
             border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #4f46e5, #06b6d4);
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
             margin-top: 10px;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+        .btn:hover {
+            opacity: 0.9;
         }
 
         .toggle-link {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 0.875rem;
-            color: var(--text-muted);
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #a0a0c0;
         }
 
         .toggle-link a {
-            color: var(--accent);
+            color: #38bdf8;
             text-decoration: none;
-            font-weight: 600;
+            cursor: pointer;
         }
 
         .toggle-link a:hover {
             text-decoration: underline;
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <i class="fa-solid fa-capsules brand-icon"></i>
-            <h2>medicine_remainder</h2>
-            <div class="clock-badge">
-                <i class="fa-regular fa-clock"></i>
-                <span id="live-clock">--:--:--</span>
-            </div>
-        </div>
+    <div class="card">
+        <!-- Logo Header -->
+        <svg class="logo" viewBox="0 0 24 24" fill="#38bdf8">
+            <path d="M4.5 10.5C3.67 10.5 3 11.17 3 12s.67 1.5 1.5 1.5h15c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5h-15z"/>
+        </svg>
+        <h2>medicine_remainder</h2>
 
-        <form action="/login" method="POST">
+        <!-- LOGIN FORM -->
+        <form id="login-form" action="/login" method="POST">
             <div class="form-group">
-                <label for="username">Username</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-user"></i>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Enter username" required>
-                </div>
+                <label>USERNAME</label>
+                <input type="text" name="username" placeholder="Enter username" required>
             </div>
-
             <div class="form-group">
-                <label for="password">Password</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
-                </div>
+                <label>PASSWORD</label>
+                <input type="password" name="password" placeholder="Enter password" required>
             </div>
-
-            <button type="submit" class="btn-primary">Sign In</button>
+            <button type="submit" class="btn">Sign In</button>
+            <div class="toggle-link">
+                New patient? <a onclick="showRegister()">Create Account</a>
+            </div>
         </form>
 
-        <div class="toggle-link">
-            New patient? <a href="#">Create Account</a>
-        </div>
+        <!-- REGISTER FORM -->
+        <form id="register-form" action="/register" method="POST" class="hidden">
+            <div class="form-group">
+                <label>USERNAME</label>
+                <input type="text" name="username" placeholder="Choose a username" required>
+            </div>
+            <div class="form-group">
+                <label>PASSWORD</label>
+                <input type="password" name="password" placeholder="Choose a password" required>
+            </div>
+            <div class="form-group">
+                <label>EMAIL</label>
+                <input type="email" name="email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label>AGE</label>
+                <input type="number" name="age" placeholder="Enter age">
+            </div>
+            <div class="form-group">
+                <label>DISEASE / CONDITION</label>
+                <input type="text" name="disease" placeholder="Enter condition">
+            </div>
+            <button type="submit" class="btn">Register</button>
+            <div class="toggle-link">
+                Already have an account? <a onclick="showLogin()">Sign In</a>
+            </div>
+        </form>
     </div>
 
     <script>
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('live-clock').textContent = now.toLocaleTimeString();
+        function showRegister() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+
+        function showLogin() {
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        }
     </script>
 </body>
 </html>

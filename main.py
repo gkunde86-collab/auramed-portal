@@ -102,10 +102,23 @@ def login():
         user = cursor.fetchone()
 
         if user:
-            cursor.execute("SELECT id, name, medicine_type, dosage, CAST(reminder_time AS CHAR) as reminder_time FROM medicines WHERE user_id = %s", (user['id'],))
-            alarms = cursor.fetchall()
+            cursor.execute("SELECT id, name, medicine_type, dosage, reminder_time FROM medicines WHERE user_id = %s", (user['id'],))
+            raw_alarms = cursor.fetchall()
             cursor.close()
             conn.close()
+
+            # Safely parse MySQL timedelta / time objects to string format (HH:MM)
+            alarms = []
+            for alarm in raw_alarms:
+                reminder_str = str(alarm['reminder_time'])
+                alarms.append({
+                    "id": alarm['id'],
+                    "name": alarm['name'],
+                    "medicine_type": alarm['medicine_type'],
+                    "dosage": alarm['dosage'],
+                    "reminder_time": reminder_str
+                })
+
             return render_template('index.html', user=user, alarms=alarms)
         
         cursor.close()

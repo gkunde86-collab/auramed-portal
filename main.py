@@ -26,27 +26,27 @@ def init_db():
     if conn:
         try:
             cursor = conn.cursor()
-            # Patients Table
+            # Ensure users table exists with correct schema
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS patients (
+                CREATE TABLE IF NOT EXISTS users (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    username VARCHAR(100) UNIQUE NOT NULL,
+                    username VARCHAR(50) UNIQUE NOT NULL,
                     password VARCHAR(255) NOT NULL,
-                    email VARCHAR(100),
-                    age INT,
-                    disease VARCHAR(255),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    email VARCHAR(100) NOT NULL,
+                    age INT NOT NULL,
+                    disease_type VARCHAR(100) NOT NULL
                 );
             """)
-            # Medicines & Alarms Table
+            # Ensure medicines table exists with correct schema
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS alarms (
+                CREATE TABLE IF NOT EXISTS medicines (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     user_id INT NOT NULL,
-                    medicine_name VARCHAR(255) NOT NULL,
-                    alarm_time VARCHAR(10) NOT NULL,
-                    notes VARCHAR(255),
-                    FOREIGN KEY (user_id) REFERENCES patients(id) ON DELETE CASCADE
+                    name VARCHAR(100) NOT NULL,
+                    medicine_type VARCHAR(50) NOT NULL,
+                    dosage VARCHAR(50) NOT NULL,
+                    reminder_time TIME NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                 );
             """)
             conn.commit()
@@ -68,7 +68,7 @@ def register():
     password = data.get('password')
     email = data.get('email')
     age = data.get('age')
-    disease = data.get('disease')
+    disease_type = data.get('disease') or data.get('disease_type')
 
     if not username or not password:
         return render_template('index.html', error="Username and Password required.")
@@ -77,13 +77,14 @@ def register():
     if conn:
         try:
             cursor = conn.cursor()
-            query = "INSERT INTO patients (username, password, email, age, disease) VALUES (%s, %s, %s, %s, %s)"
-            cursor.execute(query, (username, password, email, age, disease))
+            query = "INSERT INTO users (username, password, email, age, disease_type) VALUES (%s, %s, %s, %s, %s)"
+            cursor.execute(query, (username, password, email, age, disease_type))
             conn.commit()
             cursor.close()
             conn.close()
             return render_template('index.html', success="Registration successful! Please login.")
         except Error as e:
+            print(f"Registration Error: {e}")
             return render_template('index.html', error="Username already exists or database error.")
     return render_template('index.html', error="Database connection failed.")
 
@@ -99,16 +100,18 @@ def login():
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM patients WHERE username = %s AND password = %s", (username, password))
+        # Target the users table matching your Workbench database
+        cursor.execute("SELECT id, username, email, age, disease_type FROM users WHERE username = %s AND password = %s", (username, password))
         user = cursor.fetchone()
 
         if user:
-            # Fetch alarms for this specific patient
-            cursor.execute("SELECT * FROM alarms WHERE user_id = %s", (user['id'],))
+            # Fetch active alarms for this specific user from medicines table
+            cursor.execute("SELECT * FROM medicines WHERE user_id = %s", (user['id'],))
             alarms = cursor.fetchall()
             cursor.close()
             conn.close()
             return render_template('index.html', user=user, alarms=alarms)
+        
         cursor.close()
         conn.close()
 
@@ -118,15 +121,18 @@ def login():
 def add_alarm():
     data = request.get_json()
     user_id = data.get('user_id')
-    medicine_name = data.get('medicine_name')
-    alarm_time = data.get('alarm_time')
-    notes = data.get('notes')
+    name = data.get('medicine_name')
+    medicine_type = data.get('medicine_type', 'Tablet')
+    dosage = data.get('dosage', '1')
+    reminder_time = data.get('alarm_time')
 
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO alarms (user_id, medicine_name, alarm_time, notes) VALUES (%s, %s, %s, %s)",
-                       (user_id, medicine_name, alarm_time, notes))
+        cursor.execute("""
+            INSERT INTO medicines (user_id, name, medicine_type, dosage, reminder_time) 
+            VALUES (%s, %s, %s, %s, %s)
+        """, (user_id, name, medicine_type, dosage, reminder_time))
         conn.commit()
         cursor.close()
         conn.close()

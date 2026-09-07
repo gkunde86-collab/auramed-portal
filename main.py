@@ -107,16 +107,15 @@ def login():
             cursor.close()
             conn.close()
 
-            # Safely parse MySQL timedelta / time objects to string format (HH:MM)
+            # SAFELY CONVERT TIME OBJECTS TO STRINGS FOR JINJA TEMPLATE
             alarms = []
             for alarm in raw_alarms:
-                reminder_str = str(alarm['reminder_time'])
                 alarms.append({
                     "id": alarm['id'],
                     "name": alarm['name'],
                     "medicine_type": alarm['medicine_type'],
                     "dosage": alarm['dosage'],
-                    "reminder_time": reminder_str
+                    "reminder_time": str(alarm['reminder_time']) # Convert time object to string
                 })
 
             return render_template('index.html', user=user, alarms=alarms)
